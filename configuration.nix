@@ -13,8 +13,7 @@
     <home-manager/nixos>
   ];
 
-  nix.settings.experimental-features = [ "nix-command"];
-
+  nix.settings.experimental-features = [ "nix-command" ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -127,16 +126,13 @@
           src = pkgs.fishPlugins.grc.src;
         }
       ];
-#       shellInit = ''
-#         if command -q nix-your-shell
-#         nix-your-shell fish | source
-#         end
-#       '';
-shellInit = ''
-    ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
-  '';
+      shellInit = ''
+        ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
+      '';
     };
     programs.bash.enable = false;
+
+    programs.ssh.enable = true;
 
     programs.plasma = {
       enable = true;
