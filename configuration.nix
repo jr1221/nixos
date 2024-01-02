@@ -1,3 +1,6 @@
+# symlink to /etc/nixos/configuration.nix
+# sudo ln -s /home/jack/Documents/nixos/configuration.nix /etc/nixos/
+
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
@@ -5,17 +8,19 @@
 { config, lib, pkgs, ... }:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-      <home-manager/nixos>
-    ];
+  imports = [ # Include the results of the hardware scan.
+    /etc/nixos/hardware-configuration.nix
+    <home-manager/nixos>
+  ];
+
+  nix.settings.experimental-features = [ "nix-command"];
+
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = "jack-xps9570-nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Configure network proxy if necessary
@@ -84,85 +89,107 @@
     isNormalUser = true;
     description = "Jack Rubacha";
     extraGroups = [ "networkmanager" "wheel" ];
-	shell = pkgs.fish;  
-};
-users.users.jack.ignoreShellProgramCheck = true;
+    shell = pkgs.fish;
+  };
 
+  programs.fish.enable = true;
+
+  users.users.jack.ignoreShellProgramCheck = true;
 
   home-manager.useGlobalPkgs = true;
   home-manager.users.jack = { pkgs, ... }: {
-  home.username = "jack";
-  home.homeDirectory = "/home/jack";
-  programs.home-manager.enable = true;
-imports = [
-      <plasma-manager/modules>
+    home.username = "jack";
+    home.homeDirectory = "/home/jack";
+    programs.home-manager.enable = true;
+    imports = [ <plasma-manager/modules> ];
+    home.packages = with pkgs; [
+      htop
+      efibootmgr
+      (vivaldi.override {
+        enableWidevine = true;
+        proprietaryCodecs = true;
+      })
+      github-desktop
+      slack
+      meld
+      git
+      nixfmt
+      #nix-your-shell
+      any-nix-shell
+      grc
     ];
-	home.packages =  with pkgs; [
-          htop
-          efibootmgr
-          (vivaldi.override { enableWidevine = true; 
-  			      proprietaryCodecs = true;
-	  })
-          github-desktop
-	  slack
-          meld
-	git  
-];
-  programs.fish.enable = true;
- programs.bash.enable = false;
+    programs.fish = {
+      enable = true;
+      plugins = [
+        # Enable a plugin (here grc for colorized command output) from nixpkgs
+        {
+          name = "grc";
+          src = pkgs.fishPlugins.grc.src;
+        }
+      ];
+#       shellInit = ''
+#         if command -q nix-your-shell
+#         nix-your-shell fish | source
+#         end
+#       '';
+shellInit = ''
+    ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
+  '';
+    };
+    programs.bash.enable = false;
 
-  programs.plasma = {
-	enable = true;  
-	configFile = {
- "baloofilerc"."Basic Settings"."Indexing-Enabled" = false;
-      "krunnerrc"."Plugins"."baloosearchEnabled" = false;
-      "kdeglobals"."KDE"."SingleClick" = false;
-      "kdeglobals"."KScreen"."ScaleFactor" = 2;
-      "kdeglobals"."KScreen"."ScreenScaleFactors" = "eDP-1-1=2;DP-1-1=2;DP-1-2=2;DP-1-3=2;";
-	"kwinrc"."NightColor"."Active" = true;
-      "kwinrc"."NightColor"."Mode" = "Constant";
-      "kwinrc"."NightColor"."NightTemperature" = 5400;   
-      "plasmarc"."Theme"."name" = "breeze-dark";
-      "kwinrc"."Xwayland"."Scale" = 2;
-      "kdeglobals"."WM"."activeBackground" = "49,54,59";
-      "kdeglobals"."WM"."activeBlend" = "252,252,252";
-      "kdeglobals"."WM"."activeForeground" = "252,252,252";
-      "kdeglobals"."WM"."inactiveBackground" = "42,46,50";
-      "kdeglobals"."WM"."inactiveBlend" = "161,169,177";
-      "kdeglobals"."WM"."inactiveForeground" = "161,169,177";
-};
- };
-  # The state version is required and should stay at the version you
-  # originally installed.
-  home.stateVersion = "23.11";
+    programs.plasma = {
+      enable = true;
+      configFile = {
+        "baloofilerc"."Basic Settings"."Indexing-Enabled" = false;
+        "krunnerrc"."Plugins"."baloosearchEnabled" = false;
+        "kdeglobals"."KDE"."SingleClick" = false;
+        "kdeglobals"."KScreen"."ScaleFactor" = 2;
+        "kdeglobals"."KScreen"."ScreenScaleFactors" =
+          "eDP-1-1=2;DP-1-1=2;DP-1-2=2;DP-1-3=2;";
+        "kwinrc"."NightColor"."Active" = true;
+        "kwinrc"."NightColor"."Mode" = "Constant";
+        "kwinrc"."NightColor"."NightTemperature" = 5400;
+        "plasmarc"."Theme"."name" = "breeze-dark";
+        "kwinrc"."Xwayland"."Scale" = 2;
+        "kdeglobals"."WM"."activeBackground" = "49,54,59";
+        "kdeglobals"."WM"."activeBlend" = "252,252,252";
+        "kdeglobals"."WM"."activeForeground" = "252,252,252";
+        "kdeglobals"."WM"."inactiveBackground" = "42,46,50";
+        "kdeglobals"."WM"."inactiveBlend" = "161,169,177";
+        "kdeglobals"."WM"."inactiveForeground" = "161,169,177";
+      };
+    };
+    # The state version is required and should stay at the version you
+    # originally installed.
+    home.stateVersion = "23.11";
 
-};
+  };
 
   # Enable automatic login for the user.
   services.xserver.displayManager.autoLogin.enable = true;
-services.xserver.displayManager.defaultSession = "plasmawayland";
-#services.xserver.displayManager.sddm.settings.Wayland.SessionDir = "${pkgs.plasma5Packages.plasma-workspace}/share/wayland-sessions";
-services.xserver.displayManager.lightdm = { 
-    enable = true; 
-    greeter.enable = true; 
-};
- services.xserver.displayManager.autoLogin.user = "jack";
-environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  services.xserver.displayManager.defaultSession = "plasmawayland";
+  #services.xserver.displayManager.sddm.settings.Wayland.SessionDir = "${pkgs.plasma5Packages.plasma-workspace}/share/wayland-sessions";
+  services.xserver.displayManager.lightdm = {
+    enable = true;
+    greeter.enable = true;
+  };
+  services.xserver.displayManager.autoLogin.user = "jack";
+  environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
   # Allow unfree packages
-  nixpkgs.config = {
-	allowUnfree = true;
-  };
+  nixpkgs.config = { allowUnfree = true; };
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-  #  wget
-    kate
-  ];
+  environment.systemPackages = with pkgs;
+    [
+      #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+      #  wget
+      kate
+    ];
 
- security.polkit.enable = true;
+  security.polkit.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -182,7 +209,7 @@ environment.sessionVariables.NIXOS_OZONE_WL = "1";
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
-   # Enable OpenGL
+  # Enable OpenGL
   hardware.opengl = {
     enable = true;
     driSupport = true;
@@ -190,7 +217,7 @@ environment.sessionVariables.NIXOS_OZONE_WL = "1";
   };
 
   # Load nvidia driver for Xorg and Wayland
-  services.xserver.videoDrivers = ["nvidia"];
+  services.xserver.videoDrivers = [ "nvidia" ];
 
   hardware.nvidia = {
 
@@ -213,20 +240,20 @@ environment.sessionVariables.NIXOS_OZONE_WL = "1";
     open = false;
 
     # Enable the Nvidia settings menu,
-	# accessible via `nvidia-settings`.
+    # accessible via `nvidia-settings`.
     nvidiaSettings = true;
 
     # Optionally, you may need to select the appropriate driver version for your specific GPU.
     package = config.boot.kernelPackages.nvidiaPackages.stable;
 
     prime = {
-	offload = {
-			enable = true;
-			enableOffloadCmd = true;
-		};
+      offload = {
+        enable = true;
+        enableOffloadCmd = true;
+      };
 
-        intelBusId = "PCI:0:2:0";
-        nvidiaBusId = "PCI:1:0:0";
+      intelBusId = "PCI:0:2:0";
+      nvidiaBusId = "PCI:1:0:0";
     };
   };
 
