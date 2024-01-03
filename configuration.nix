@@ -19,8 +19,11 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  boot.kernel.sysctl = { "vm.swappiness" = 10;};
+
   networking.hostName = "jack-xps9570-nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  networking.firewall.enable = false;
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -51,7 +54,7 @@
   services.xserver.enable = true;
 
   # Enable the KDE Plasma Desktop Environment.
-  #services.xserver.displayManager.sddm.enable = true;
+  services.xserver.displayManager.sddm.enable = true;
   services.xserver.desktopManager.plasma5.enable = true;
 
   # Configure keymap in X11
@@ -103,6 +106,7 @@
     imports = [ <plasma-manager/modules> ];
     home.packages = with pkgs; [
       htop
+      kate
       efibootmgr
       (vivaldi.override {
         enableWidevine = true;
@@ -113,9 +117,11 @@
       meld
       git
       nixfmt
-      #nix-your-shell
-      any-nix-shell
+      #any-nix-shell
       grc
+      rpi-imager
+      partition-manager
+      killall
     ];
     programs.fish = {
       enable = true;
@@ -126,9 +132,9 @@
           src = pkgs.fishPlugins.grc.src;
         }
       ];
-      shellInit = ''
-        ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
-      '';
+      #       shellInit = ''
+      #         ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
+      #       '';
     };
     programs.bash.enable = false;
 
@@ -163,13 +169,9 @@
   };
 
   # Enable automatic login for the user.
-  services.xserver.displayManager.autoLogin.enable = true;
+  services.xserver.displayManager.autoLogin.enable = false;
   services.xserver.displayManager.defaultSession = "plasmawayland";
   #services.xserver.displayManager.sddm.settings.Wayland.SessionDir = "${pkgs.plasma5Packages.plasma-workspace}/share/wayland-sessions";
-  services.xserver.displayManager.lightdm = {
-    enable = true;
-    greeter.enable = true;
-  };
   services.xserver.displayManager.autoLogin.user = "jack";
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
@@ -182,7 +184,6 @@
     [
       #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
       #  wget
-      kate
     ];
 
   security.polkit.enable = true;

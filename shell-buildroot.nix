@@ -1,6 +1,6 @@
 # symlink to buildroot submodule:
 # ln -s /home/jack/Documents/nixos/shell-buildroot.nix /home/jack/Projects/NER/buildroot/Siren/odysseus/buildroot/shell.nix
-# nix-shell
+# run `nix-shell --pure --keep XDG_SESSION_TYPE --keep QT_PLUGIN_PATH  --keep XDG_DATA_DIRS` to open
 
 let pkgs = import <nixpkgs> { };
 in (pkgs.buildFHSUserEnv {
@@ -11,7 +11,8 @@ in (pkgs.buildFHSUserEnv {
         pkg-config
         ncurses
         qt5.qtbase
-        # new gcc usually causes issues with building kernel so use an old one
+        libsForQt5.qt5ct
+
         pkgsCross.aarch64-multiplatform.gccStdenv.cc
         (hiPrio gcc)
 
@@ -43,12 +44,21 @@ in (pkgs.buildFHSUserEnv {
 
         # other
         git-lfs
-        libelf
+        util-linux
+        libxcrypt-legacy
+
+        # needed for nixos
+#         (glibc.override {
+#           withLibcrypt = true;
+#         })
       ] ++ pkgs.linux.nativeBuildInputs);
-  runScript = pkgs.writeScript "init.sh" ''
-    export PKG_CONFIG_PATH="${pkgs.ncurses.dev}/lib/pkgconfig:${pkgs.qt5.qtbase.dev}/lib/pkgconfig"
+  runScript = "bash";
+  profile = ''
     export QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.qt5.qtbase.bin}/lib/qt-${pkgs.qt5.qtbase.version}/plugins"
     export QT_QPA_PLATFORMTHEME=qt5ct
-    exec fish
+    export QT_WAYLAND_FORCE_DPI=84
+    export PKG_CONFIG_PATH="${pkgs.ncurses.dev}/lib/pkgconfig:${pkgs.qt5.qtbase.dev}/lib/pkgconfig"
+    export NIX_SSL_CERT_FILE="/etc/ssl/certs/ca-certificates.crt"
+    export SSL_CERT_FILE="/etc/ssl/certs/ca-bundle.cr"
   '';
 }).env
