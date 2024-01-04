@@ -9,9 +9,13 @@ in (pkgs.buildFHSUserEnv {
     (with pkgs;
       [
         pkg-config
+
+        # menuconfig
         ncurses
+
+        # xconfig
         qt5.qtbase
-        libsForQt5.qt5ct
+        libsForQt5.qt5ct # theme for xconfig
 
         pkgsCross.aarch64-multiplatform.gccStdenv.cc
         (hiPrio gcc)
@@ -46,11 +50,6 @@ in (pkgs.buildFHSUserEnv {
         git-lfs
         util-linux
         libxcrypt-legacy
-
-        # needed for nixos
-#         (glibc.override {
-#           withLibcrypt = true;
-#         })
       ] ++ pkgs.linux.nativeBuildInputs);
   runScript = "bash";
   profile = ''

@@ -13,17 +13,20 @@
     <home-manager/nixos>
   ];
 
+  # allow nix commands such as nix run, etc.
   nix.settings.experimental-features = [ "nix-command" ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  boot.kernel.sysctl = { "vm.swappiness" = 10;};
+  boot.kernel.sysctl = {
+    "vm.swappiness" = 10;
+    "kernel.sysrq" = 1;
+  };
 
   networking.hostName = "jack-xps9570-nixos"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-  networking.firewall.enable = false;
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
@@ -91,13 +94,16 @@
     isNormalUser = true;
     description = "Jack Rubacha";
     extraGroups = [ "networkmanager" "wheel" ];
+    # sets default shell (doesnt apply to nix-shell)
     shell = pkgs.fish;
   };
 
   programs.fish.enable = true;
 
+  # ignores if shell installed, as uses home-manager shell
   users.users.jack.ignoreShellProgramCheck = true;
 
+  # allows to use the environment pkg manager, fixes issue with nonfree
   home-manager.useGlobalPkgs = true;
   home-manager.users.jack = { pkgs, ... }: {
     home.username = "jack";
@@ -117,8 +123,7 @@
       meld
       git
       nixfmt
-      #any-nix-shell
-      grc
+      grc # colored fish output
       rpi-imager
       partition-manager
       killall
@@ -132,10 +137,8 @@
           src = pkgs.fishPlugins.grc.src;
         }
       ];
-      #       shellInit = ''
-      #         ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
-      #       '';
     };
+    # ensure bash doesnt come alive
     programs.bash.enable = false;
 
     programs.ssh.enable = true;
@@ -168,12 +171,11 @@
 
   };
 
-  # Enable automatic login for the user.
+  # autologin mysteriously broken
   services.xserver.displayManager.autoLogin.enable = false;
   services.xserver.displayManager.defaultSession = "plasmawayland";
-  #services.xserver.displayManager.sddm.settings.Wayland.SessionDir = "${pkgs.plasma5Packages.plasma-workspace}/share/wayland-sessions";
   services.xserver.displayManager.autoLogin.user = "jack";
-  environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  environment.sessionVariables.NIXOS_OZONE_WL = "1"; # for electron wayland
 
   # Allow unfree packages
   nixpkgs.config = { allowUnfree = true; };
@@ -182,10 +184,9 @@
   # $ nix search wget
   environment.systemPackages = with pkgs;
     [
-      #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-      #  wget
     ];
 
+  # for root escalation in guis (kate still doesnt work?)
   security.polkit.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -205,16 +206,25 @@
   # networking.firewall.allowedTCPPorts = [ ... ];
   # networking.firewall.allowedUDPPorts = [ ... ];
   # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.firewall.enable = false;
   # Enable OpenGL
   hardware.opengl = {
     enable = true;
     driSupport = true;
     driSupport32Bit = true;
+    extraPackages = with pkgs; [
+      intel-media-driver # LIBVA_DRIVER_NAME=iHD
+      vaapiIntel         # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
+      vaapiVdpau
+      libvdpau-va-gl
+    ];
   };
 
   # Load nvidia driver for Xorg and Wayland
-  services.xserver.videoDrivers = [ "nvidia" ];
+  services.xserver.videoDrivers = [
+  "intel"
+  "nvidia"
+  ];
 
   hardware.nvidia = {
 
