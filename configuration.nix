@@ -93,15 +93,19 @@
   users.users.jack = {
     isNormalUser = true;
     description = "Jack Rubacha";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker"];
     # sets default shell (doesnt apply to nix-shell)
     shell = pkgs.fish;
   };
 
   programs.fish.enable = true;
+  # cant use as user package!
+  programs.partition-manager.enable = true;
 
   # ignores if shell installed, as uses home-manager shell
   users.users.jack.ignoreShellProgramCheck = true;
+
+  virtualisation.docker.enable = true;
 
   # allows to use the environment pkg manager, fixes issue with nonfree
   home-manager.useGlobalPkgs = true;
@@ -125,8 +129,12 @@
       nixfmt
       grc # colored fish output
       rpi-imager
-      partition-manager
       killall
+
+      # for rust
+      cargo
+      rustc
+      gcc
     ];
     programs.fish = {
       enable = true;
@@ -142,6 +150,15 @@
     programs.bash.enable = false;
 
     programs.ssh.enable = true;
+
+    programs.vscode = {
+      enable = true;
+      extensions = with pkgs.vscode-extensions; [
+      arrterian.nix-env-selector
+
+      rust-lang.rust-analyzer
+      ];
+    };
 
     programs.plasma = {
       enable = true;
@@ -182,9 +199,7 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs;
-    [
-    ];
+  environment.systemPackages = with pkgs; [ ];
 
   # for root escalation in guis (kate still doesnt work?)
   security.polkit.enable = true;
@@ -214,17 +229,14 @@
     driSupport32Bit = true;
     extraPackages = with pkgs; [
       intel-media-driver # LIBVA_DRIVER_NAME=iHD
-      vaapiIntel         # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
+      vaapiIntel # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
       vaapiVdpau
       libvdpau-va-gl
     ];
   };
 
   # Load nvidia driver for Xorg and Wayland
-  services.xserver.videoDrivers = [
-  "intel"
-  "nvidia"
-  ];
+  services.xserver.videoDrivers = [ "intel" "nvidia" ];
 
   hardware.nvidia = {
 
@@ -263,6 +275,9 @@
       nvidiaBusId = "PCI:1:0:0";
     };
   };
+
+  # for linux dual boot w/ windows
+  time.hardwareClockInLocalTime = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

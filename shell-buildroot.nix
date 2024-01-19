@@ -17,7 +17,7 @@ in (pkgs.buildFHSUserEnv {
         qt5.qtbase
         libsForQt5.qt5ct # theme for xconfig
 
-        pkgsCross.aarch64-multiplatform.gccStdenv.cc
+        #pkgsCross.aarch64-multiplatform.gccStdenv.cc
         (hiPrio gcc)
 
         # mandatory
