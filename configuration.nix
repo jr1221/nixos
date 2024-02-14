@@ -13,6 +13,14 @@
     <home-manager/nixos>
   ];
 
+  # for space savings
+  nix.settings.auto-optimise-store = true;
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 30d";
+  };
+
   # allow nix commands such as nix run, etc.
   nix.settings.experimental-features = [ "nix-command" ];
 
@@ -93,7 +101,7 @@
   users.users.jack = {
     isNormalUser = true;
     description = "Jack Rubacha";
-    extraGroups = [ "networkmanager" "wheel" "docker"];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     # sets default shell (doesnt apply to nix-shell)
     shell = pkgs.fish;
   };
@@ -130,11 +138,7 @@
       grc # colored fish output
       rpi-imager
       killall
-
-      # for rust
-      cargo
-      rustc
-      gcc
+      libsForQt5.konversation
     ];
     programs.fish = {
       enable = true;
@@ -154,9 +158,9 @@
     programs.vscode = {
       enable = true;
       extensions = with pkgs.vscode-extensions; [
-      arrterian.nix-env-selector
+        arrterian.nix-env-selector
 
-      rust-lang.rust-analyzer
+        rust-lang.rust-analyzer
       ];
     };
 
