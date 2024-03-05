@@ -96,12 +96,13 @@
 
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
+  users.groups.plugdev = { };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.jack = {
     isNormalUser = true;
     description = "Jack Rubacha";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" "plugdev" ];
     # sets default shell (doesnt apply to nix-shell)
     shell = pkgs.fish;
   };
@@ -203,7 +204,21 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [ ];
+  environment.systemPackages = with pkgs; [ libsmbios ];
+  systemd = {
+    services = {
+      dell-thermal-mode = {
+        after = [ "post-resume.target" ];
+        serviceConfig = {
+          Type = "oneshot";
+          Restart = "no";
+          ExecStart =
+            "${pkgs.libsmbios}/bin/smbios-thermal-ctl --set-thermal-mode=balanced";
+        };
+        wantedBy = [ "multi-user.target" "post-resume.target" ];
+      };
+    };
+  };
 
   # for root escalation in guis (kate still doesnt work?)
   security.polkit.enable = true;
@@ -279,6 +294,11 @@
       nvidiaBusId = "PCI:1:0:0";
     };
   };
+
+  # for dfu esp 
+  services.udev.extraRules = ''
+    SUBSYSTEMS=="usb", ATTRS{idVendor}=="303a", ATTRS{idProduct}=="00??", GROUP="plugdev", MODE="0666"
+  '';
 
   # for linux dual boot w/ windows
   time.hardwareClockInLocalTime = true;
