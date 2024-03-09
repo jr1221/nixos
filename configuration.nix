@@ -139,7 +139,6 @@
       grc # colored fish output
       rpi-imager
       killall
-      libsForQt5.konversation
     ];
     programs.fish = {
       enable = true;
@@ -150,6 +149,16 @@
           src = pkgs.fishPlugins.grc.src;
         }
       ];
+    };
+
+    # let home manager manage startx
+    xsession.enable = true;
+    xsession.windowManager.command = "…";
+
+    programs.git = {
+      enable = true;
+      userName = "Jack Rubacha";
+      userEmail = "rubacha.jack03@gmail.com";
     };
     # ensure bash doesnt come alive
     programs.bash.enable = false;
@@ -302,6 +311,10 @@
 
   # for linux dual boot w/ windows
   time.hardwareClockInLocalTime = true;
+
+  # enable linux nonfree
+  hardware.enableAllFirmware = true;
+  hardware.cpu.intel.updateMicrocode = true;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
