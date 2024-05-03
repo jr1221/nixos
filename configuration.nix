@@ -131,7 +131,7 @@
         enableWidevine = true;
         proprietaryCodecs = true;
       })
-      github-desktop
+      gitkraken
       slack
       meld
       git
@@ -222,7 +222,7 @@
           Type = "oneshot";
           Restart = "no";
           ExecStart =
-            "${pkgs.libsmbios}/bin/smbios-thermal-ctl --set-thermal-mode=balanced";
+            "${pkgs.libsmbios}/bin/smbios-thermal-ctl --set-thermal-mode=performance";
         };
         wantedBy = [ "multi-user.target" "post-resume.target" ];
       };
