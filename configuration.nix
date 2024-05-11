@@ -143,15 +143,15 @@
         gitkraken
         slack
         (vivaldi.override {
-      enableWidevine = true;
-      proprietaryCodecs = true;
-      commandLineArgs = [
-        "--enable-features=UseOzonePlatform"
-        "--ozone-platform=wayland"
-        "--ozone-platform-hint=auto"
-        "--enable-features=WaylandWindowDecorations"
-      ];
-    })
+          enableWidevine = true;
+          proprietaryCodecs = true;
+          commandLineArgs = [
+            "--enable-features=UseOzonePlatform"
+            "--ozone-platform=wayland"
+            "--ozone-platform-hint=auto"
+            "--enable-features=WaylandWindowDecorations"
+          ];
+        })
         meld
         git
         nixfmt-rfc-style
@@ -201,6 +201,7 @@
           clickItemTo = "select";
           colorScheme = "breezeDark";
           lookAndFeel = "org.kde.breezedark.desktop";
+          wallpaperPictureOfTheDay.provider = "wcpotd";
         };
         windows = {
           allowWindowsToRememberPositions = true;
@@ -531,9 +532,7 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    libsmbios
-  ];
+  environment.systemPackages = with pkgs; [ libsmbios ];
   systemd = {
     services = {
       dell-thermal-mode = {
