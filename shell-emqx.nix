@@ -1,6 +1,8 @@
 # ln -s /home/jack/Documents/nixos/shell-emqx.nix /home/jack/Projects/NER/emqx/shell.nix
 
-{ pkgs ? import <nixpkgs> { } }:
+{
+  pkgs ? import <nixpkgs> { },
+}:
 pkgs.mkShell {
   nativeBuildInputs = with pkgs; [
     gnumake

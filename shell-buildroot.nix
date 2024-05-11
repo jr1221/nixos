@@ -2,11 +2,15 @@
 # ln -s /home/jack/Documents/nixos/shell-buildroot.nix /home/jack/Projects/NER/buildroot/Siren/odysseus/buildroot/shell.nix
 # run `nix-shell --pure --keep XDG_SESSION_TYPE --keep QT_PLUGIN_PATH  --keep XDG_DATA_DIRS` to open
 
-let pkgs = import <nixpkgs> { };
-in (pkgs.buildFHSUserEnv {
+let
+  pkgs = import <nixpkgs> { };
+in
+(pkgs.buildFHSUserEnv {
   name = "buildroot";
-  targetPkgs = pkgs:
-    (with pkgs;
+  targetPkgs =
+    pkgs:
+    (
+      with pkgs;
       [
         pkg-config
 
@@ -50,7 +54,9 @@ in (pkgs.buildFHSUserEnv {
         git-lfs
         util-linux
         libxcrypt-legacy
-      ] ++ pkgs.linux.nativeBuildInputs);
+      ]
+      ++ pkgs.linux.nativeBuildInputs
+    );
   runScript = "bash";
   profile = ''
     export QT_QPA_PLATFORM_PLUGIN_PATH="${pkgs.qt5.qtbase.bin}/lib/qt-${pkgs.qt5.qtbase.version}/plugins"

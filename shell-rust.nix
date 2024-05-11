@@ -1,6 +1,8 @@
 # ln -s /home/jack/Documents/nixos/shell-rust.nix /home/jack/Projects/NER/Calypso/shell.nix
 
-{ pkgs ? import <nixpkgs> { } }:
+{
+  pkgs ? import <nixpkgs> { },
+}:
 pkgs.mkShell {
   nativeBuildInputs = with pkgs; [
     rustc
