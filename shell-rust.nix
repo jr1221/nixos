@@ -15,7 +15,8 @@ pkgs.mkShell {
     openssl
     pkg-config
     cmake
-
+    python3
+    python311Packages.ruamel-yaml
     # rust
     rust-analyzer
   ];
