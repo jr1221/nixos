@@ -38,7 +38,7 @@
 
   boot.kernel.sysctl = {
     "vm.swappiness" = 10;
-    "kernel.sysrq" = 1;
+    "kernel.sysrq" = 502;
   };
 
   networking.hostName = "jack-xps9570-nixos"; # Define your hostname.
@@ -86,7 +86,6 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  sound.enable = true;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -158,6 +157,7 @@
         stm32cubemx
         mqttui
       ];
+
       programs.fish = {
         enable = true;
         plugins = [
@@ -539,7 +539,7 @@
         serviceConfig = {
           Type = "oneshot";
           Restart = "no";
-          ExecStart = "${pkgs.libsmbios}/bin/smbios-thermal-ctl --set-thermal-mode=performance";
+          ExecStart = "${pkgs.libsmbios}/bin/smbios-thermal-ctl --set-thermal-mode=cool-bottom";
         };
         wantedBy = [
           "multi-user.target"
@@ -571,10 +571,8 @@
   # Or disable the firewall altogether.
   networking.firewall.enable = false;
   # Enable OpenGL
-  hardware.opengl = {
+  hardware.graphics = {
     enable = true;
-    driSupport = true;
-    driSupport32Bit = true;
     extraPackages = with pkgs; [
       intel-media-driver # LIBVA_DRIVER_NAME=iHD
       vaapiIntel # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
