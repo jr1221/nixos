@@ -1,18 +1,16 @@
 # ln -s /home/jack/Documents/nixos/shell-rust.nix /home/jack/Projects/NER/Calypso/shell.nix
 
-{
-  pkgs ? import <nixpkgs> { },
-}:
-pkgs.mkShell {
+with import <nixpkgs> { };
+
+mkShell {
   nativeBuildInputs = with pkgs; [
     rustc
     cargo
     gcc
     rustfmt
     clippy
-
-    # for paho-mqtt
     openssl
+    # for paho-mqtt
     pkg-config
     cmake
     python3
