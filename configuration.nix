@@ -70,17 +70,20 @@
   };
 
   # Enable the X11 windowing system.
-  services.xserver.enable = true;
 
   # Enable the KDE Plasma Desktop Environment.
-  services.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
-
-  # Configure keymap in X11
-  services.xserver = {
-    xkb.layout = "us";
-    xkb.variant = "";
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true;
   };
+  services.desktopManager.plasma6.enable = true;
+  services.displayManager.defaultSession = "plasma";
+
+  #   # Configure keymap in X11
+  #   services.xserver = {
+  #     xkb.layout = "us";
+  #     xkb.variant = "";
+  #   };
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -129,8 +132,6 @@
   virtualisation.docker = {
     enable = true;
   };
-
-  programs.nix-ld.enable = true;
 
   # allows to use the environment pkg manager, fixes issue with nonfree
   home-manager.useGlobalPkgs = true;
@@ -199,7 +200,7 @@
             {
               name = "probe-rs-debugger";
               publisher = "probe-rs";
-              version = "0.24.0";
+              version = "0.24.2";
               sha256 = "d46b390f9c1ab3f64e650ad50f7fd48919b96dbd76bc6225eb40195761276b34";
             }
           ];
@@ -597,11 +598,12 @@
     ];
   };
 
+
   # Load nvidia driver for Xorg and Wayland
-  services.xserver.videoDrivers = [
-    "intel"
-    "nvidia"
-  ];
+  #   services.xserver.videoDrivers = [
+  #     "intel"
+  #     "nvidia"
+  #   ];
 
   hardware.nvidia = {
 
@@ -800,6 +802,7 @@
   # enable linux nonfree
   hardware.enableAllFirmware = true;
   hardware.cpu.intel.updateMicrocode = true;
+
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
