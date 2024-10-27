@@ -160,7 +160,8 @@
         killall
         #ner
         stm32cubemx
-        mqttui
+        #mqttui
+        (callPackage /etc/nixos/derivation-mqttui.nix {})
       ];
 
       programs.fish = {
